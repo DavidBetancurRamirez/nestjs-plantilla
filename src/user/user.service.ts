@@ -27,14 +27,16 @@ export class UserService {
   }
 
   async validateUser(email: string, password: string): Promise<UserResponse> {
+    const invalid_message = "Invalid credentials"
+
     const user = await this.findByEmailWithPassword(email);
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(invalid_message);
     }
 
     const isPasswordValid = await bcryptjs.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(invalid_message);
     }
 
     return this.toUserResponse(user);
@@ -90,14 +92,14 @@ export class UserService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<UserResponse> {
     const existingUser = await this.findOne(id);
-    return await this.updateUser(existingUser, updateUserDto);
+    return await this.update(existingUser, updateUserDto);
   }
 
   async updateMe(userActive: UserActiveInterface, updateMeDto: UpdateMeDto): Promise<LoginResponse> {
     const user = await this.profile(userActive.email);
-    const userUpdated = await this.updateUser(user, updateMeDto);
+    const userUpdated = await this.update(user, updateMeDto);
 
     const tokens = user.email !== userUpdated.email 
       ? await this.tokenService.generateTokens(userUpdated) 
@@ -110,7 +112,7 @@ export class UserService {
     };
   }
 
-  private async updateUser(user: UserResponse, updateUserDto: UpdateUserDto): Promise<UserResponse> {
+  private async update(user: UserResponse, updateUserDto: UpdateUserDto): Promise<UserResponse> {
     if (updateUserDto?.email && updateUserDto.email !== user?.email) {
       await this.validateUserExist(updateUserDto.email);
     }
@@ -123,17 +125,17 @@ export class UserService {
     return await this.findOne(user.id);
   }
 
-  async remove(id: number): Promise<DeleteUserDto> {
+  async removeUser(id: number): Promise<DeleteUserDto> {
     await this.findOne(id);
-    return this.removeUser(id);
+    return this.remove(id);
   }
 
   async removeMe(userActive: UserActiveInterface): Promise<DeleteUserDto> {
     const user = await this.profile(userActive.email);
-    return this.removeUser(user.id);
+    return this.remove(user.id);
   }
 
-  private async removeUser(id: number): Promise<DeleteUserDto> {
+  private async remove(id: number): Promise<DeleteUserDto> {
     await this.userRepository.softDelete({ id });
     return { message: 'User successfully deleted' };
   }
@@ -149,7 +151,7 @@ export class UserService {
     }
   }
 
-  private toUserResponse(user: User): UserResponse {
+  toUserResponse(user: User): UserResponse {
     delete user["password"];
     delete user["deletedAt"];
     

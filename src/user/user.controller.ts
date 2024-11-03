@@ -72,13 +72,13 @@ export class UserController {
     @Param('id') id: number, 
     @Body() updateUserDto: UpdateUserDto
   ): Promise<UserResponse> {
-    return this.userService.update(id, updateUserDto);
+    return this.userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'RemoveUser' })
   @Auth([Role.ADMIN])
   remove(@Param('id') id: number): Promise<DeleteUserDto> {
-    return this.userService.remove(id);
+    return this.userService.removeUser(id);
   }
 }
