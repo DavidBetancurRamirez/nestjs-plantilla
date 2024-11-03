@@ -2,33 +2,60 @@
 Plantilla usada para proyectos de nest.js
 
 
+## Ramas (opciones)
+### sql
+Cuenta con una configuracion base para ser usada con una base de datos relacional (postgress - sql)
+
+### nosql
+Cuenta con una configuracion base para ser usada con una base de datos no relacional (mongodb - nosql)
+
+
 ## Ejecutar
-**Variables necesarias en el .env para modo dev:**
+1. Variables necesarias en el .env:
+
+Con cualquier rama:
 ```
+JWT_SECRET=
+JWT_REFRESH_SECRET=
+```
+
+Para rama **sql**:
+```
+DB_TYPE="sql"
 DB_HOST=
 DB_PORT=
 DB_USERNAME=
 DB_PASSWORD=
 DB_NAME=
 DB_SSL=
-JWT_SECRET=
-JWT_REFRESH_SECRET=
+  # Variables para servicio pgadmin (contenedor de docker)
 PGADMIN_EMAIL=
 PGADMIN_PASSWORD=
 PGADMIN_PORT=
 ```
 
-**Levantar BD con docker:**
+Para rama **nosql**:
+```
+DB_TYPE="nosql"
+MONGO_URI=
+  # Variables para servicio mongo-express (contenedor de docker)
+MONGO_INITDB_ROOT_USERNAME=
+MONGO_INITDB_ROOT_PASSWORD=
+MONGO_PORT=
+MONGO_EXPRESS_PORT=
+```
+
+2. Levantar Base de Datos con docker:
 ```
 docker compose up -d
 ```
 
-**Descargar dependencias:**
+3. Descargar dependencias:
 ```
 npm i
 ```
 
-**Ejecutar modo dev:**
+4. Ejecutar modo dev:
 ```
 npm run dev
 ```
@@ -36,7 +63,6 @@ npm run dev
 
 ## Contenido
 - *Documentación con swagger*
-- *Base de Datos con postgres (NoSQL)*
 - *Tipos de usuarios*
   1. **user:** por defecto
   2. **admin:** permiso para hacer todo
@@ -86,12 +112,16 @@ git fetch upstream
 ```
 
 2. *Aplicar cambios de la plantilla (upstream):*
+
+Se debe de seleccionar la rama (opcion) que se este usando.
+Si se usa la rama **sql**:
 ```
-git merge upstream/main
+git merge upstream/sql
 ```
-O tambien:
+
+Si se usa la rama **nosql**:
 ```
-git rebase upstream/main
+git merge upstream/nosql
 ```
 
 3. *Resolver conflictos:*
@@ -114,7 +144,7 @@ export class ExampleModule {}
 ```
 
 ---
-### Para usar modulo con entidad:
+### Para usar modulo con sql:
 *example.module.ts*
 ```
 @Module({
